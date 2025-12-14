@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from '../../src/main.js';
 
 test.each(
   [undefined, null, true, 0, 0n, '', 'test', Symbol('test'), Object.create({}), new Set([])],

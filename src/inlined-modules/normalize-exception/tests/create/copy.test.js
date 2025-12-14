@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from '../../src/main.js';
 
 const setInvalidProp = (propName) =>
   // eslint-disable-next-line fp/no-mutating-methods

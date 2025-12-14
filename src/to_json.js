@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from './inlined-modules/normalize-exception/src/main.js';
 
 import { isObject } from './is_object.js';
 

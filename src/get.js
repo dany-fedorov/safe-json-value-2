@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from './inlined-modules/normalize-exception/src/main.js';
 
 // Same as `safeGetProp()` but without any `changes`
 export const safeGetChangeProp = ({ parent, key }) => {

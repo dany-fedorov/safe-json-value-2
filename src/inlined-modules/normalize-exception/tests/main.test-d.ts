@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from '../src/main.d';
 import { expectAssignable, expectType } from 'tsd';
 
 const error = new Error('test');

@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from '../src/main.js';
 
 const { propertyIsEnumerable: isEnum } = Object.prototype;
 

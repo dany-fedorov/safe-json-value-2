@@ -1,6 +1,6 @@
 import { runInNewContext } from 'node:vm';
 
-import normalizeException from 'normalize-exception';
+import normalizeException from '../../src/main.js';
 
 const { toString: objectToString } = Object.prototype;
 

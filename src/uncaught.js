@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception';
+import normalizeException from './inlined-modules/normalize-exception/src/main.js';
 
 // When dynamic functions (`object.toJSON()`, `get` method or Proxy hook):
 //  - Returns new objects (as opposed to reference to existing objects)
