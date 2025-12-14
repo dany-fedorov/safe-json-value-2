@@ -1,15 +1,15 @@
-import safeJsonValue from 'safe-json-value-2';
+import safeJsonValue from '../src/main.js';
 
-test('Calls object.toJSON()', (t) => {
+test('Calls object.toJSON()', () => {
   const input = {
     toJSON: () => true,
   };
   const { value, changes } = safeJsonValue(input);
-  t.true(value);
+  expect(value).toBe(true);
   expect(changes).toEqual([{ path: [], oldValue: input, newValue: true, reason: 'unresolvedToJSON' }]);
 });
 
-test('Handles object.toJSON() returning undefined', (t) => {
+test('Handles object.toJSON() returning undefined', () => {
   const input = { prop: { toJSON: () => {} } };
   const { value, changes } = safeJsonValue(input);
   expect(value).toEqual({});
@@ -29,7 +29,7 @@ test('Handles object.toJSON() returning undefined', (t) => {
   ]);
 });
 
-test('Handles object.toJSON() that throws', (t) => {
+test('Handles object.toJSON() that throws', () => {
   const error = new Error('test');
   const input = {
     toJSON: () => {
@@ -37,7 +37,7 @@ test('Handles object.toJSON() that throws', (t) => {
     },
   };
   const { value, changes } = safeJsonValue(input);
-  t.is(value, undefined);
+  expect(value).toBe(undefined);
   expect(changes).toEqual([
     {
       path: [],
@@ -55,14 +55,14 @@ test('Handles object.toJSON() that throws', (t) => {
   ]);
 });
 
-test('Handles object.toJSON that are not functions', (t) => {
+test('Handles object.toJSON that are not functions', () => {
   const input = { toJSON: true };
   const { value, changes } = safeJsonValue(input);
   expect(value).toEqual(input);
   expect(changes).toEqual([]);
 });
 
-test('Handles dates', (t) => {
+test('Handles dates', () => {
   const input = new Date();
   const newValue = input.toJSON();
   const { value, changes } = safeJsonValue(input);
@@ -70,7 +70,7 @@ test('Handles dates', (t) => {
   expect(changes).toEqual([{ path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' }]);
 });
 
-test('Does not call object.toJSON() recursively', (t) => {
+test('Does not call object.toJSON() recursively', () => {
   const newValue = { toJSON: () => {}, prop: true };
   const input = { toJSON: () => newValue };
   const { value, changes } = safeJsonValue(input);
@@ -108,18 +108,19 @@ const inputCallSelfRef = {
   toJSON: () => safeJsonValue(inputCallSelfRef).value,
 };
 
-each([inputCallParent, inputCallSelfCopy], ({ title }, input) => {
-  test(`Handles object.toJSON() that call the library itself with a parent or a copy | ${title}`, (t) => {
+test.each([inputCallParent, inputCallSelfCopy])(
+  `Handles object.toJSON() that call the library itself with a parent or a copy | %#`,
+  (input) => {
     const value = input.prop.toJSON();
-    t.false('two' in value.prop);
-    t.false('toJSON' in value.prop);
+    expect('two' in value.prop).toBe(false);
+    expect('toJSON' in value.prop).toBe(false);
     expect(value).toEqual({ prop: { prop: { one: true } } });
-  });
-});
+  },
+);
 
-test('Handles object.toJSON() that calls the library itself', (t) => {
+test('Handles object.toJSON() that calls the library itself', () => {
   const value = inputCallSelfRef.toJSON();
-  t.false('two' in value);
-  t.false('toJSON' in value);
+  expect('two' in value).toBe(false);
+  expect('toJSON' in value).toBe(false);
   expect(value).toEqual({ one: true });
 });

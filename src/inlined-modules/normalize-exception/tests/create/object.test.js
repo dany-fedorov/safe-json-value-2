@@ -2,90 +2,88 @@ import normalizeException from '../../src/main.js';
 
 const { propertyIsEnumerable: isEnum } = Object.prototype;
 
-test('Plain-objects errors can have names', (t) => {
+test('Plain-objects errors can have names', () => {
   const name = 'Error';
   const error = normalizeException({ name });
-  t.is(error.name, name);
-  t.false(isEnum.call(error, 'name'));
-  t.true(error instanceof Error);
+  expect(error.name).toBe(name);
+  expect(isEnum.call(error, 'name')).toBe(false);
+  expect(error instanceof Error).toBe(true);
 });
 
-test('Plain-objects errors can re-use native error classes', (t) => {
+test('Plain-objects errors can re-use native error classes', () => {
   const name = 'TypeError';
   const error = normalizeException({ name });
-  t.is(error.name, name);
-  t.true(error instanceof TypeError);
+  expect(error.name).toBe(name);
+  expect(error instanceof TypeError).toBe(true);
 });
 
-test('Plain-objects errors can have stacks', (t) => {
+test('Plain-objects errors can have stacks', () => {
   const message = 'test';
   const stack = `Error: ${message}\n  at here`;
   const error = normalizeException({ message, stack });
-  t.is(error.stack, stack);
-  t.false(isEnum.call(error, 'stack'));
+  expect(error.stack).toBe(stack);
+  expect(isEnum.call(error, 'stack')).toBe(false);
 });
 
-test('Plain-objects errors without stacks get one', (t) => {
+test('Plain-objects errors without stacks get one', () => {
   const { stack } = normalizeException({});
-  t.true(stack.includes('Error'));
-  t.true(stack.includes('{}'));
+  expect(stack.includes('Error')).toBe(true);
+  expect(stack.includes('{}')).toBe(true);
 });
 
-test('Plain-objects errors without stacks get one based on object', (t) => {
+test('Plain-objects errors without stacks get one based on object', () => {
   const { stack } = normalizeException({ name: 'TypeError', message: 'test' });
-  t.true(stack.includes('TypeError'));
-  t.true(stack.includes('test'));
+  expect(stack.includes('TypeError')).toBe(true);
+  expect(stack.includes('test')).toBe(true);
 });
 
-test('Plain-objects errors can have causes', (t) => {
+test('Plain-objects errors can have causes', () => {
   const cause = new Error('test');
   const error = normalizeException({ cause });
-  t.is(error.cause, cause);
-  t.false(isEnum.call(error, 'cause'));
+  expect(error.cause).toBe(cause);
+  expect(isEnum.call(error, 'cause')).toBe(false);
 });
 
-test('Plain-objects errors can have aggregate errors', (t) => {
+test('Plain-objects errors can have aggregate errors', () => {
   const errors = [new Error('test')];
   const error = normalizeException({ errors });
   expect(error.errors).toEqual(errors);
-  t.false(isEnum.call(error, 'errors'));
+  expect(isEnum.call(error, 'errors')).toBe(false);
 });
 
-test('Plain-objects errors can have static properties', (t) => {
-  t.true(normalizeException({ message: 'test', prop: true }).prop);
+test('Plain-objects errors can have static properties', () => {
+  expect(normalizeException({ message: 'test', prop: true }).prop).toBe(true);
 });
 
-test('Plain-objects errors can have messages', (t) => {
+test('Plain-objects errors can have messages', () => {
   const message = 'test';
   const error = normalizeException({ message });
-  t.is(error.message, message);
-  t.false(isEnum.call(error, 'message'));
+  expect(error.message).toBe(message);
+  expect(isEnum.call(error, 'message')).toBe(false);
 });
 
-each(['', true], ({ title }, message) => {
-  test(`Plain-objects errors cannot have invalid messages | ${title}`, (t) => {
-    t.is(normalizeException({ message }).message, '{}');
-  });
+test.each(['', true])(`Plain-objects errors cannot have invalid messages | %#`, (message) => {
+  expect(normalizeException({ message }).message).toBe('{}');
 });
 
-test('Plain-objects errors without messages are serialized', (t) => {
+test('Plain-objects errors without messages are serialized', () => {
   const exception = { prop: true };
-  t.is(normalizeException(exception).message, JSON.stringify(exception));
+  expect(normalizeException(exception).message).toBe(JSON.stringify(exception));
 });
 
-test('Plain-objects errors without messages are serialized even with recursion', (t) => {
+test('Plain-objects errors without messages are serialized even with recursion', () => {
   const exception = { prop: true };
   // eslint-disable-next-line fp/no-mutation
   exception.self = exception;
   const error = normalizeException(exception);
-  t.is(error.message, String({}));
+  expect(error.message).toBe(String({}));
 });
 
 const throwError = () => {
   throw new Error('test');
 };
 
-test('Plain-objects errors without messages are serialized even with unsafe fields', (t) => {
+test('Plain-objects errors without messages are serialized even with unsafe fields', () => {
   const exception = {
     one: true,
     two: { toJSON: throwError },
@@ -94,29 +92,29 @@ test('Plain-objects errors without messages are serialized even with unsafe fiel
       throw new Error('test');
     },
   };
-  t.is(normalizeException(exception).message, String({}));
+  expect(normalizeException(exception).message).toBe(String({}));
 });
 
-test('Plain-objects errors without messages are serialized even with top-level unsafe fields', (t) => {
+test('Plain-objects errors without messages are serialized even with top-level unsafe fields', () => {
   const exception = { toJSON: throwError };
-  t.is(normalizeException(exception).message, String({}));
+  expect(normalizeException(exception).message).toBe(String({}));
 });
 
-test('Plain-objects errors without messages are serialized even with invalid toString()', (t) => {
+test('Plain-objects errors without messages are serialized even with invalid toString()', () => {
   const exception = { one: true, two: 0n, toString: throwError };
-  t.is(normalizeException(exception).message, 'Invalid error');
+  expect(normalizeException(exception).message).toBe('Invalid error');
 });
 
-test('Plain-objects errors without messages but with bigints are serialized', (t) => {
+test('Plain-objects errors without messages but with bigints are serialized', () => {
   const exception = { one: true, two: 0n };
-  t.is(normalizeException(exception).message, String({}));
+  expect(normalizeException(exception).message).toBe(String({}));
 });
 
-test('Plain-objects errors without messages but with long fields are serialized', (t) => {
+test('Plain-objects errors without messages but with long fields are serialized', () => {
   const exception = { one: true, two: 'a'.repeat(BIG_STRING_LENGTH) };
   const { message } = normalizeException(exception);
-  t.true(message.includes('one'));
-  t.true(message.length < BIG_STRING_LENGTH);
+  expect(message.includes('one')).toBe(true);
+  expect(message.length < BIG_STRING_LENGTH).toBe(true);
 });
 
 const BIG_STRING_LENGTH = 1e6;

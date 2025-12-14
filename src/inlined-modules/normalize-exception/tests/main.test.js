@@ -41,7 +41,7 @@ test.each([undefined, true, ''])(`Fix invalid error.stack | %#`, (value) => {
   expect(isEnum.call(error, 'stack')).toBe(false);
 });
 
-test.serial('Fix invalid error.name without constructor names', () => {
+test('Fix invalid error.name without constructor names', () => {
   const error = new TypeError('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(TypeError, 'name', { value: '' });

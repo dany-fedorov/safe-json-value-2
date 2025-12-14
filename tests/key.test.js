@@ -1,4 +1,4 @@
-import safeJsonValue from 'safe-json-value-2';
+import safeJsonValue from '../src/main.js';
 
 const symbol = Symbol('test');
 test.each([

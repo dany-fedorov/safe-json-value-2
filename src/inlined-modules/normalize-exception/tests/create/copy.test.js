@@ -8,41 +8,40 @@ const invalidGet = () => {
   throw new Error('getterError');
 };
 
-test('Handle throwing getters on name', (t) => {
-  t.is(normalizeException(setInvalidProp('name')).name, 'Error');
+test('Handle throwing getters on name', () => {
+  expect(normalizeException(setInvalidProp('name')).name).toBe('Error');
 });
 
-test('Handle throwing getters on message', (t) => {
-  t.is(normalizeException(setInvalidProp('message')).message, '{}');
+test('Handle throwing getters on message', () => {
+  expect(normalizeException(setInvalidProp('message')).message).toBe('{}');
 });
 
-test('Handle throwing getters on stack', (t) => {
+test('Handle throwing getters on stack', () => {
   const error = normalizeException(setInvalidProp('stack'));
-  t.true(error.stack.includes(error.toString()));
+  expect(error.stack.includes(error.toString())).toBe(true);
 });
 
-test('Handle throwing getters on cause', (t) => {
-  t.is(normalizeException(setInvalidProp('cause')).cause, undefined);
+test('Handle throwing getters on cause', () => {
+  expect(normalizeException(setInvalidProp('cause')).cause).toBe(undefined);
 });
 
-test('Handle throwing getters on aggregate errors', (t) => {
-  t.is(normalizeException(setInvalidProp('errors')).errors, undefined);
+test('Handle throwing getters on aggregate errors', () => {
+  expect(normalizeException(setInvalidProp('errors')).errors).toBe(undefined);
 });
 
-test('Handle throwing getters on plain objects', (t) => {
-  t.is(
+test('Handle throwing getters on plain objects', () => {
+  expect(
     normalizeException({
       // eslint-disable-next-line fp/no-get-set
       get name() {
         throw new Error('getterError');
       },
     }).name,
-    'Error',
-  );
+  ).toBe('Error');
 });
 
-test('Plain-objects errors ignore non-enumerable static properties', (t) => {
-  t.is(
+test('Plain-objects errors ignore non-enumerable static properties', () => {
+  expect(
     normalizeException(
       // eslint-disable-next-line fp/no-mutating-methods
       Object.defineProperty({ message: 'test' }, 'prop', {
@@ -50,13 +49,12 @@ test('Plain-objects errors ignore non-enumerable static properties', (t) => {
         enumerable: false,
       }),
     ).prop,
-    undefined,
-  );
+  ).toBe(undefined);
 });
 
-test('Plain-objects errors do not ignore non-enumerable core properties', (t) => {
+test('Plain-objects errors do not ignore non-enumerable core properties', () => {
   const name = 'TypeError';
-  t.is(
+  expect(
     normalizeException(
       // eslint-disable-next-line fp/no-mutating-methods
       Object.defineProperty({ message: 'test' }, 'name', {
@@ -64,8 +62,7 @@ test('Plain-objects errors do not ignore non-enumerable core properties', (t) =>
         enumerable: false,
       }),
     ).name,
-    name,
-  );
+  ).toBe(name);
 });
 
 // eslint-disable-next-line fp/no-class
@@ -75,16 +72,16 @@ Object.defineProperty(ChildError.prototype, 'message', { value: 'test' });
 // eslint-disable-next-line fp/no-mutating-methods
 Object.defineProperty(ChildError.prototype, 'prop', { value: true });
 
-test('Plain-objects errors ignore inherited static properties', (t) => {
+test('Plain-objects errors ignore inherited static properties', () => {
   const error = new ChildError();
   Object.preventExtensions(error);
-  t.is(error.prop, true);
-  t.is(normalizeException(error).prop, undefined);
+  expect(error.prop).toBe(true);
+  expect(normalizeException(error).prop).toBe(undefined);
 });
 
-test('Plain-objects errors do not ignore inherited core properties', (t) => {
+test('Plain-objects errors do not ignore inherited core properties', () => {
   const error = new ChildError();
   Object.preventExtensions(error);
-  t.is(error.message, 'test');
-  t.is(normalizeException(error).message, 'test');
+  expect(error.message).toBe('test');
+  expect(normalizeException(error).message).toBe('test');
 });

@@ -2,7 +2,7 @@ import normalizeException from '../src/main.js';
 
 const { propertyIsEnumerable: isEnum } = Object.prototype;
 
-test('Handles non-enumerable inherited error properties', (t) => {
+test('Handles non-enumerable inherited error properties', () => {
   // eslint-disable-next-line fp/no-class
   class TestError extends Error {}
   // eslint-disable-next-line fp/no-mutating-methods
@@ -12,16 +12,16 @@ test('Handles non-enumerable inherited error properties', (t) => {
     enumerable: true,
     configurable: true,
   });
-  t.true(isEnum.call(TestError.prototype, 'name'));
+  expect(isEnum.call(TestError.prototype, 'name')).toBe(true);
   const error = new TestError('test');
-  t.false(Object.hasOwn(error, 'name'));
-  t.true(isEnum.call(Object.getPrototypeOf(error), 'name'));
+  expect(Object.hasOwn(error, 'name')).toBe(false);
+  expect(isEnum.call(Object.getPrototypeOf(error), 'name')).toBe(true);
   const normalizedError = normalizeException(error);
-  t.true(Object.hasOwn(normalizedError, 'name'));
-  t.false(isEnum.call(normalizedError, 'name'));
+  expect(Object.hasOwn(normalizedError, 'name')).toBe(true);
+  expect(isEnum.call(normalizedError, 'name')).toBe(false);
 });
 
-test('Handles non-enumerable getters', (t) => {
+test('Handles non-enumerable getters', () => {
   const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(error, 'message', {
@@ -30,15 +30,15 @@ test('Handles non-enumerable getters', (t) => {
     enumerable: true,
     configurable: true,
   });
-  t.is(error.message, 'testTwo');
-  t.true(isEnum.call(error, 'message'));
+  expect(error.message).toBe('testTwo');
+  expect(isEnum.call(error, 'message')).toBe(true);
   const normalizedError = normalizeException(error);
-  t.is(normalizedError.message, 'testTwo');
-  t.false(isEnum.call(normalizedError, 'message'));
-  t.is(Object.getOwnPropertyDescriptor(normalizedError, 'message').get, getMessage);
+  expect(normalizedError.message).toBe('testTwo');
+  expect(isEnum.call(normalizedError, 'message')).toBe(false);
+  expect(Object.getOwnPropertyDescriptor(normalizedError, 'message').get).toBe(getMessage);
 });
 
-test('Handles readonly getters', (t) => {
+test('Handles readonly getters', () => {
   const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(error, 'message', {
@@ -46,9 +46,9 @@ test('Handles readonly getters', (t) => {
     enumerable: true,
     configurable: true,
   });
-  t.is(error.message, 'testTwo');
+  expect(error.message).toBe('testTwo');
   const normalizedError = normalizeException(error);
-  t.is(Object.getOwnPropertyDescriptor(normalizedError, 'message').value, 'testTwo');
+  expect(Object.getOwnPropertyDescriptor(normalizedError, 'message').value).toBe('testTwo');
 });
 
 const getMessage = () => 'testTwo';

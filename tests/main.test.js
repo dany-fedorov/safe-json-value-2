@@ -1,14 +1,14 @@
-import safeJsonValue from '../dist/main';
+import safeJsonValue from '../src/main.js';
 
-test('Is deep by default on objects', (t) => {
+test('Is deep by default on objects', () => {
   expect(safeJsonValue({ one: 0n }).value).toEqual({});
 });
 
-test('Is deep by default on arrays', (t) => {
+test('Is deep by default on arrays', () => {
   expect(safeJsonValue([0n]).value).toEqual([]);
 });
 
-test('Can be shallow on objects', (t) => {
+test('Can be shallow on objects', () => {
   const value = { one: 0n };
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(value, 'two', {
@@ -20,11 +20,11 @@ test('Can be shallow on objects', (t) => {
   expect(safeJsonValue(value, { shallow: true }).value).toEqual({ one: 0n });
 });
 
-test('Can be shallow on arrays', (t) => {
+test('Can be shallow on arrays', () => {
   const value = [0n];
   expect(safeJsonValue(value, { shallow: true }).value).toEqual(value);
 });
 
-test('Can be shallow on non-objects nor arrays', (t) => {
-  t.is(safeJsonValue(0n, { shallow: true }).value, undefined);
+test('Can be shallow on non-objects nor arrays', () => {
+  expect(safeJsonValue(0n, { shallow: true }).value).toBe(undefined);
 });

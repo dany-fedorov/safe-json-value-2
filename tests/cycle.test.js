@@ -1,11 +1,11 @@
-import safeJsonValue from 'safe-json-value-2';
+import safeJsonValue from '../src/main.js';
 
-test('Omit circular values', (t) => {
+test('Omit circular values', () => {
   const input = {};
   // eslint-disable-next-line fp/no-mutation
   input.self = input;
   const { value, changes } = safeJsonValue(input);
-  t.false('self' in value);
+  expect('self' in value).toBe(false);
   expect(changes).toEqual([
     {
       path: ['self'],
