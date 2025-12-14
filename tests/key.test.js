@@ -1,10 +1,7 @@
-import test from 'ava'
-import { each } from 'test-each'
-
 import safeJsonValue from 'safe-json-value-2'
 
 const symbol = Symbol('test')
-each(
+test.each(
   [
     {
       input: { [symbol]: true },

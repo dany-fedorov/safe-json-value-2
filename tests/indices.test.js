@@ -1,9 +1,6 @@
-import test from 'ava'
-import { each } from 'test-each'
-
 import safeJsonValue from '../dist/main'
 
-each(
+test.each(
   ['prop', Symbol('test')],
   [true, false],
   [

@@ -1,9 +1,6 @@
-import test from 'ava'
-import { each } from 'test-each'
-
 import safeJsonValue from 'safe-json-value-2'
 
-each(
+test.each(
   [
     { value: () => {}, reason: 'ignoredFunction' },
     { value: Symbol('test'), reason: 'ignoredSymbolValue' },

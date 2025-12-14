@@ -1,29 +1,23 @@
-import normalizeException from 'normalize-exception'
-import { expectAssignable, expectType } from 'tsd'
+import normalizeException from 'normalize-exception';
+import { expectAssignable, expectType } from 'tsd';
 
-const error = new Error('test')
-expectAssignable<Error>(error)
-normalizeException(undefined)
-normalizeException('test')
-normalizeException('test', {})
-normalizeException('test', { shallow: true })
+const error = new Error('test');
+expectAssignable<Error>(error);
+normalizeException(undefined);
+normalizeException('test');
+normalizeException('test', {});
+normalizeException('test', { shallow: true });
 
 // @ts-expect-error
-normalizeException()
+normalizeException();
 // @ts-expect-error
-normalizeException(error, { unknown: true })
+normalizeException(error, { unknown: true });
 // @ts-expect-error
-normalizeException(error, { shallow: 'true' })
+normalizeException(error, { shallow: 'true' });
 
-expectType<'TypeError'>(
-  normalizeException(error as Error & { name: 'TypeError' }).name,
-)
-expectType<string>(normalizeException(error as Error & { name: '' }).name)
-expectType<'test'>(
-  normalizeException(error as Error & { message: 'test' }).message,
-)
-expectType<''>(normalizeException(error as Error & { message: '' }).message)
-expectType<'stack'>(
-  normalizeException(error as Error & { stack: 'stack' }).stack,
-)
-expectType<string>(normalizeException(error as Error & { stack: '' }).stack)
+expectType<'TypeError'>(normalizeException(error as Error & { name: 'TypeError' }).name);
+expectType<string>(normalizeException(error as Error & { name: '' }).name);
+expectType<'test'>(normalizeException(error as Error & { message: 'test' }).message);
+expectType<''>(normalizeException(error as Error & { message: '' }).message);
+expectType<'stack'>(normalizeException(error as Error & { stack: 'stack' }).stack);
+expectType<string>(normalizeException(error as Error & { stack: '' }).stack);

@@ -1,7 +1,4 @@
-import test from 'ava'
-import { each } from 'test-each'
-
-import safeJsonValue from 'safe-json-value-2'
+import safeJsonValue from 'safe-json-value-2';
 
 const strings = [
   'test',
@@ -16,9 +13,9 @@ const strings = [
   // Invalid UTF-8 sequences
   '\uDF06\uD834',
   '\uDEAD',
-]
+];
 
-each(
+test.each(
   [
     {},
     [],
@@ -38,11 +35,11 @@ each(
   ],
   ({ title }, input) => {
     test(`Applies options.maxSize on values | ${title}`, (t) => {
-      const size = JSON.stringify(input).length
+      const size = JSON.stringify(input).length;
       t.deepEqual(safeJsonValue(input, { maxSize: size }), {
         value: input,
         changes: [],
-      })
+      });
       t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
         value: undefined,
         changes: [
@@ -53,19 +50,19 @@ each(
             reason: 'unsafeSize',
           },
         ],
-      })
-    })
+      });
+    });
   },
-)
+);
 
-each([...strings], ({ title }, key) => {
+test.each([...strings], ({ title }, key) => {
   test(`Applies options.maxSize on properties | ${title}`, (t) => {
-    const input = { one: true, [key]: true }
-    const size = JSON.stringify(input).length
+    const input = { one: true, [key]: true };
+    const size = JSON.stringify(input).length;
     t.deepEqual(safeJsonValue(input, { maxSize: size }), {
       changes: [],
       value: input,
-    })
+    });
     t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
       value: { one: true },
       changes: [
@@ -76,12 +73,12 @@ each([...strings], ({ title }, key) => {
           reason: 'unsafeSize',
         },
       ],
-    })
-  })
-})
+    });
+  });
+});
 
-const symbol = Symbol('test')
-each(
+const symbol = Symbol('test');
+test.each(
   [
     {
       input: { one: undefined, prop: true },
@@ -98,18 +95,16 @@ each(
   ],
   ({ title }, { input, output, key, reason = 'ignoredUndefined' }) => {
     test(`Omitted values do not count towards options.maxSize | ${title}`, (t) => {
-      const maxSize = JSON.stringify(output).length
+      const maxSize = JSON.stringify(output).length;
       t.deepEqual(safeJsonValue(input, { maxSize }), {
-        changes: [
-          { path: [key], oldValue: undefined, newValue: undefined, reason },
-        ],
+        changes: [{ path: [key], oldValue: undefined, newValue: undefined, reason }],
         value: output,
-      })
-    })
+      });
+    });
   },
-)
+);
 
-each(
+test.each(
   [
     {
       input: { one: { two: { three: true, four: true } } },
@@ -124,21 +119,16 @@ each(
   ],
   ({ title }, { input, output, path }) => {
     test(`Applies options.maxSize in a depth-first manner | ${title}`, (t) => {
-      t.deepEqual(
-        safeJsonValue(input, { maxSize: JSON.stringify(output).length }),
-        {
-          value: output,
-          changes: [
-            { path, oldValue: true, newValue: undefined, reason: 'unsafeSize' },
-          ],
-        },
-      )
-    })
+      t.deepEqual(safeJsonValue(input, { maxSize: JSON.stringify(output).length }), {
+        value: output,
+        changes: [{ path, oldValue: true, newValue: undefined, reason: 'unsafeSize' }],
+      });
+    });
   },
-)
+);
 
-const error = new Error('test')
-each(
+const error = new Error('test');
+test.each(
   [
     {
       input: { two: undefined },
@@ -171,7 +161,7 @@ each(
       // eslint-disable-next-line fp/no-mutating-methods
       input: Object.defineProperty({}, 'prop', {
         get: () => {
-          throw error
+          throw error;
         },
         enumerable: true,
         configurable: true,
@@ -182,18 +172,13 @@ each(
       title: 'unsafeObjectProp',
     },
   ],
-  (
-    { title },
-    { input, output, key, sizeIncrement = 0, change, sizeChange = {} },
-  ) => {
+  ({ title }, { input, output, key, sizeIncrement = 0, change, sizeChange = {} }) => {
     test(`Does not recurse if object property key, property comma or array comma is over options.maxSize | ${title}`, (t) => {
       t.deepEqual(safeJsonValue(input), {
         value: output,
-        changes: [
-          { path: [key], oldValue: undefined, newValue: undefined, ...change },
-        ],
-      })
-      const maxSize = JSON.stringify(output).length + sizeIncrement
+        changes: [{ path: [key], oldValue: undefined, newValue: undefined, ...change }],
+      });
+      const maxSize = JSON.stringify(output).length + sizeIncrement;
       t.deepEqual(safeJsonValue(input, { maxSize }), {
         value: output,
         changes: [
@@ -205,16 +190,16 @@ each(
             ...sizeChange,
           },
         ],
-      })
-    })
+      });
+    });
   },
-)
+);
 
-const V8_MAX_STRING_LENGTH = 5e8
-const largeString = '\n'.repeat(V8_MAX_STRING_LENGTH)
+const V8_MAX_STRING_LENGTH = 5e8;
+const largeString = '\n'.repeat(V8_MAX_STRING_LENGTH);
 
 test('Handles very large strings', (t) => {
-  const maxSize = JSON.stringify({ one: '' }).length
+  const maxSize = JSON.stringify({ one: '' }).length;
   t.deepEqual(safeJsonValue({ one: largeString }, { maxSize }), {
     value: {},
     changes: [
@@ -225,8 +210,8 @@ test('Handles very large strings', (t) => {
         reason: 'unsafeSize',
       },
     ],
-  })
-})
+  });
+});
 
 test('Handles very large object properties', (t) => {
   t.deepEqual(safeJsonValue({ [largeString]: true }, { maxSize: 2 }), {
@@ -239,17 +224,14 @@ test('Handles very large object properties', (t) => {
         reason: 'unsafeSize',
       },
     ],
-  })
-})
+  });
+});
 
 test('Does not apply options.maxSize if infinite', (t) => {
-  t.deepEqual(
-    safeJsonValue(largeString, { maxSize: Number.POSITIVE_INFINITY }),
-    { value: largeString, changes: [] },
-  )
-})
+  t.deepEqual(safeJsonValue(largeString, { maxSize: Number.POSITIVE_INFINITY }), { value: largeString, changes: [] });
+});
 
-each([undefined, { maxSize: undefined }], ({ title }, options) => {
+test.each([undefined, { maxSize: undefined }], ({ title }, options) => {
   test(`Applies options.maxSize by default | ${title}`, (t) => {
     t.deepEqual(safeJsonValue(largeString, options), {
       value: undefined,
@@ -261,6 +243,6 @@ each([undefined, { maxSize: undefined }], ({ title }, options) => {
           reason: 'unsafeSize',
         },
       ],
-    })
-  })
-})
+    });
+  });
+});

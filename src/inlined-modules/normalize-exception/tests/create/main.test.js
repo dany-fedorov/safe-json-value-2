@@ -1,8 +1,6 @@
 import { runInNewContext } from 'node:vm'
 
-import test from 'ava'
 import normalizeException from 'normalize-exception'
-import { each } from 'test-each'
 
 const { toString: objectToString } = Object.prototype
 
@@ -22,7 +20,7 @@ Object.defineProperty(constructorWithEmptyName, 'name', { value: '' })
 const constructorWithFakeName = () => {}
 // eslint-disable-next-line fp/no-mutating-methods
 Object.defineProperty(constructorWithFakeName, 'name', { value: 'Error' })
-each(
+test.each(
   [
     '',
     constructorWithoutName,
@@ -55,7 +53,7 @@ const invalidProxyHook = () => {
   throw new Error('proxyError')
 }
 
-each(
+test.each(
   [
     'set',
     'get',

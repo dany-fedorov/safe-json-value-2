@@ -1,6 +1,3 @@
-import test from 'ava'
-import { each } from 'test-each'
-
 import safeJsonValue from 'safe-json-value-2'
 
 test('Calls object.toJSON()', (t) => {

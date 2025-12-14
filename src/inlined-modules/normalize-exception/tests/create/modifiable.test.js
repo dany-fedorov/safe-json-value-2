@@ -1,8 +1,6 @@
-import test from 'ava'
 import normalizeException from 'normalize-exception'
-import { each } from 'test-each'
 
-each(
+test.each(
   [
     { propName: 'name', value: 'TestError' },
     { propName: 'message', value: 'test' },

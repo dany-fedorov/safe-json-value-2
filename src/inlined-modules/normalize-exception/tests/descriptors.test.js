@@ -1,8 +1,6 @@
-import test from 'ava'
-import normalizeException from 'normalize-exception'
-import { each } from 'test-each'
+import normalizeException from 'normalize-exception';
 
-const { propertyIsEnumerable: isEnum } = Object.prototype
+const { propertyIsEnumerable: isEnum } = Object.prototype;
 
 test('Handles non-enumerable inherited error properties', (t) => {
   // eslint-disable-next-line fp/no-class
@@ -13,57 +11,51 @@ test('Handles non-enumerable inherited error properties', (t) => {
     writable: true,
     enumerable: true,
     configurable: true,
-  })
-  t.true(isEnum.call(TestError.prototype, 'name'))
-  const error = new TestError('test')
-  t.false(Object.hasOwn(error, 'name'))
-  t.true(isEnum.call(Object.getPrototypeOf(error), 'name'))
-  const normalizedError = normalizeException(error)
-  t.true(Object.hasOwn(normalizedError, 'name'))
-  t.false(isEnum.call(normalizedError, 'name'))
-})
+  });
+  t.true(isEnum.call(TestError.prototype, 'name'));
+  const error = new TestError('test');
+  t.false(Object.hasOwn(error, 'name'));
+  t.true(isEnum.call(Object.getPrototypeOf(error), 'name'));
+  const normalizedError = normalizeException(error);
+  t.true(Object.hasOwn(normalizedError, 'name'));
+  t.false(isEnum.call(normalizedError, 'name'));
+});
 
 test('Handles non-enumerable getters', (t) => {
-  const error = new Error('test')
+  const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(error, 'message', {
     get: getMessage,
     set: setMessage,
     enumerable: true,
     configurable: true,
-  })
-  t.is(error.message, 'testTwo')
-  t.true(isEnum.call(error, 'message'))
-  const normalizedError = normalizeException(error)
-  t.is(normalizedError.message, 'testTwo')
-  t.false(isEnum.call(normalizedError, 'message'))
-  t.is(
-    Object.getOwnPropertyDescriptor(normalizedError, 'message').get,
-    getMessage,
-  )
-})
+  });
+  t.is(error.message, 'testTwo');
+  t.true(isEnum.call(error, 'message'));
+  const normalizedError = normalizeException(error);
+  t.is(normalizedError.message, 'testTwo');
+  t.false(isEnum.call(normalizedError, 'message'));
+  t.is(Object.getOwnPropertyDescriptor(normalizedError, 'message').get, getMessage);
+});
 
 test('Handles readonly getters', (t) => {
-  const error = new Error('test')
+  const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(error, 'message', {
     get: getMessage,
     enumerable: true,
     configurable: true,
-  })
-  t.is(error.message, 'testTwo')
-  const normalizedError = normalizeException(error)
-  t.is(
-    Object.getOwnPropertyDescriptor(normalizedError, 'message').value,
-    'testTwo',
-  )
-})
+  });
+  t.is(error.message, 'testTwo');
+  const normalizedError = normalizeException(error);
+  t.is(Object.getOwnPropertyDescriptor(normalizedError, 'message').value, 'testTwo');
+});
 
-const getMessage = () => 'testTwo'
+const getMessage = () => 'testTwo';
 
-const setMessage = () => {}
+const setMessage = () => {};
 
-each(
+test.each(
   [
     { propName: 'lineNumber', enumerable: false },
     { propName: 'columnNumber', enumerable: false },
@@ -73,21 +65,18 @@ each(
   ],
   ({ title }, { propName, enumerable }) => {
     test(`Non-standard error properties are left as is | ${title}`, (t) => {
-      const error = new Error('test')
-      const value = 0
+      const error = new Error('test');
+      const value = 0;
       // eslint-disable-next-line fp/no-mutating-methods
       Object.defineProperty(error, propName, {
         value,
         enumerable,
         writable: true,
         configurable: true,
-      })
-      const normalizedError = normalizeException(error)
-      t.is(normalizedError[propName], value)
-      t.is(
-        Object.getOwnPropertyDescriptor(normalizedError, propName).enumerable,
-        enumerable,
-      )
-    })
+      });
+      const normalizedError = normalizeException(error);
+      t.is(normalizedError[propName], value);
+      t.is(Object.getOwnPropertyDescriptor(normalizedError, propName).enumerable, enumerable);
+    });
   },
-)
+);

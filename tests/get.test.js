@@ -1,9 +1,6 @@
-import test from 'ava'
-import { each } from 'test-each'
+import safeJsonValue from 'safe-json-value-2';
 
-import safeJsonValue from 'safe-json-value-2'
-
-each(
+test.each(
   [
     {
       descriptor: { configurable: false, writable: true },
@@ -21,21 +18,19 @@ each(
         value: true,
         enumerable: true,
         ...descriptor,
-      })
-      const { value, changes } = safeJsonValue(input)
-      t.deepEqual(value, { prop: true })
+      });
+      const { value, changes } = safeJsonValue(input);
+      t.deepEqual(value, { prop: true });
       t.deepEqual(Object.getOwnPropertyDescriptor(value, 'prop'), {
         value: true,
         enumerable: true,
         configurable: true,
         writable: true,
-      })
-      t.deepEqual(changes, [
-        { path: ['prop'], oldValue: true, newValue: true, reason },
-      ])
-    })
+      });
+      t.deepEqual(changes, [{ path: ['prop'], oldValue: true, newValue: true, reason }]);
+    });
   },
-)
+);
 
 each(
   [
@@ -43,7 +38,7 @@ each(
       input: {
         // eslint-disable-next-line fp/no-get-set
         get prop() {
-          return true
+          return true;
         },
       },
     },
@@ -51,7 +46,7 @@ each(
       input: {
         // eslint-disable-next-line fp/no-get-set
         get prop() {
-          return true
+          return true;
         },
         // eslint-disable-next-line fp/no-get-set
         set prop(_) {},
@@ -67,8 +62,8 @@ each(
             enumerable: true,
             writable: true,
             configurable: true,
-          })
-          return true
+          });
+          return true;
         },
       },
       title: 'selfModifyingProp',
@@ -76,7 +71,7 @@ each(
   ],
   ({ title }, { input }) => {
     test(`Resolve getters | ${title}`, (t) => {
-      const { get } = Object.getOwnPropertyDescriptor(input, 'prop')
+      const { get } = Object.getOwnPropertyDescriptor(input, 'prop');
       t.deepEqual(safeJsonValue(input), {
         value: { prop: true },
         changes: [
@@ -87,34 +82,34 @@ each(
             reason: 'unresolvedGetter',
           },
         ],
-      })
-    })
+      });
+    });
   },
-)
+);
 
 test('Resolve setters without getters', (t) => {
   // eslint-disable-next-line fp/no-get-set, accessor-pairs
-  const input = { set prop(_) {} }
-  const change = { path: ['prop'], newValue: undefined, oldValue: undefined }
+  const input = { set prop(_) {} };
+  const change = { path: ['prop'], newValue: undefined, oldValue: undefined };
   t.deepEqual(safeJsonValue(input), {
     value: {},
     changes: [
       { ...change, reason: 'unresolvedGetter' },
       { ...change, reason: 'ignoredUndefined' },
     ],
-  })
-})
+  });
+});
 
 test('Omit getters that throw', (t) => {
-  const error = new Error('test')
+  const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   const input = Object.defineProperty({}, 'prop', {
     get: () => {
-      throw error.message
+      throw error.message;
     },
     enumerable: true,
     configurable: true,
-  })
+  });
   t.deepEqual(safeJsonValue(input), {
     value: {},
     changes: [
@@ -126,8 +121,8 @@ test('Omit getters that throw', (t) => {
         error,
       },
     ],
-  })
-})
+  });
+});
 
 test('Resolve proxy get hooks', (t) => {
   // eslint-disable-next-line fp/no-proxy
@@ -138,30 +133,30 @@ test('Resolve proxy get hooks', (t) => {
         // Ensures the `value` returned by `safeJsonValue` is not a Proxy
         // anymore
         if (Reflect.get(...args)) {
-          throw new Error('test')
+          throw new Error('test');
         }
 
-        return true
+        return true;
       },
     },
-  )
+  );
   t.deepEqual(safeJsonValue(input), {
     value: { prop: true },
     changes: [],
-  })
-})
+  });
+});
 
 test('Omit proxy get hooks that throw', (t) => {
-  const error = new Error('test')
+  const error = new Error('test');
   // eslint-disable-next-line fp/no-proxy
   const input = new Proxy(
     { prop: true },
     {
       get: () => {
-        throw error.message
+        throw error.message;
       },
     },
-  )
+  );
   t.deepEqual(safeJsonValue(input), {
     value: {},
     changes: [
@@ -173,5 +168,5 @@ test('Omit proxy get hooks that throw', (t) => {
         reason: 'unsafeGetter',
       },
     ],
-  })
-})
+  });
+});
