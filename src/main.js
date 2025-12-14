@@ -1,9 +1,9 @@
-import { checkCycleThenRecurse } from './cycle.js'
-import { addNotArrayIndexChanges } from './indices.js'
-import { addSize, DEFAULT_MAX_SIZE } from './size.js'
-import { callToJSON } from './to_json.js'
-import { omitInvalidTypes } from './type.js'
-import { handleUnsafeException } from './uncaught.js'
+import { checkCycleThenRecurse } from './cycle.js';
+import { addNotArrayIndexChanges } from './indices.js';
+import { addSize, DEFAULT_MAX_SIZE } from './size.js';
+import { callToJSON } from './to_json.js';
+import { omitInvalidTypes } from './type.js';
+import { handleUnsafeException } from './uncaught.js';
 
 // Non-goals of this library:
 //  - Keeping or transtyping incompatible values
@@ -11,12 +11,9 @@ import { handleUnsafeException } from './uncaught.js'
 //     - I.e. the result is lossy
 //  - Canonicalizing the value
 //  - Supporting other formats than JSON
-const safeJsonValue = (
-  value,
-  { maxSize = DEFAULT_MAX_SIZE, shallow = false } = {},
-) => {
-  const changes = []
-  const ancestors = new Set([])
+const safeJsonValue = (value, { maxSize = DEFAULT_MAX_SIZE, shallow = false } = {}) => {
+  const changes = [];
+  const ancestors = new Set([]);
   const { value: newValue } = transformValue({
     value,
     changes,
@@ -25,28 +22,20 @@ const safeJsonValue = (
     size: 0,
     maxSize,
     shallow,
-  })
-  return { value: newValue, changes }
-}
+  });
+  return { value: newValue, changes };
+};
 
-export default safeJsonValue
+export default safeJsonValue;
 
 // The final top-level return value:
 //  - Might be `undefined`
 //  - Is not serialized to a string
-const transformValue = ({
-  value,
-  changes,
-  ancestors,
-  path,
-  size,
-  maxSize,
-  shallow,
-}) => {
+const transformValue = ({ value, changes, ancestors, path, size, maxSize, shallow }) => {
   try {
-    const valueA = callToJSON(value, changes, path)
-    const valueB = omitInvalidTypes(valueA, changes, path)
-    addNotArrayIndexChanges(valueB, changes, path)
+    const valueA = callToJSON(value, changes, path);
+    const valueB = omitInvalidTypes(valueA, changes, path);
+    addNotArrayIndexChanges(valueB, changes, path);
     return checkSizeThenRecurse({
       value: valueB,
       changes,
@@ -55,11 +44,11 @@ const transformValue = ({
       size,
       maxSize,
       shallow,
-    })
+    });
   } catch (error) {
-    return handleUnsafeException({ value, changes, path, error, size })
+    return handleUnsafeException({ value, changes, path, error, size });
   }
-}
+};
 
 // Recurse over plain objects and arrays.
 // We use a depth-first traversal.
@@ -72,15 +61,7 @@ const transformValue = ({
 //     - This favors maximizing the number of fields within the allowed
 //       `maxSize`
 //  - This is easier to implement
-const checkSizeThenRecurse = ({
-  value,
-  changes,
-  ancestors,
-  path,
-  size,
-  maxSize,
-  shallow,
-}) => {
+const checkSizeThenRecurse = ({ value, changes, ancestors, path, size, maxSize, shallow }) => {
   const { size: newSize, stop } = addSize({
     type: 'value',
     size,
@@ -88,13 +69,13 @@ const checkSizeThenRecurse = ({
     changes,
     path,
     context: value,
-  })
+  });
 
   if (stop) {
-    return { value: undefined, size }
+    return { value: undefined, size };
   }
 
-  const recurse = shallow ? identity : transformValue
+  const recurse = shallow ? identity : transformValue;
   return checkCycleThenRecurse({
     value,
     changes,
@@ -104,7 +85,7 @@ const checkSizeThenRecurse = ({
     newSize,
     maxSize,
     recurse,
-  })
-}
+  });
+};
 
-const identity = ({ value, changes }) => ({ value, changes })
+const identity = ({ value, changes }) => ({ value, changes });

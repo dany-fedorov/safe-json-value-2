@@ -1,4 +1,4 @@
-import type { Config } from '@jest/types'
+import type { Config } from '@jest/types';
 
 // Sync object
 const config: Config.InitialOptions = {
@@ -9,6 +9,6 @@ const config: Config.InitialOptions = {
   testRegex: '/(tests|src)/.*.test(\\..+)?\\.(ts|js)$',
   collectCoverageFrom: ['src/**/*.(ts|js)'],
   coverageReporters: ['json-summary', 'text', 'lcov'],
-}
+};
 
-export default config
+export default config;

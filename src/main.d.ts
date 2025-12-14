@@ -18,7 +18,7 @@ export interface Options {
    * JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
    * ```
    */
-  readonly maxSize?: number
+  readonly maxSize?: number;
 
   /**
    * If `false`, object/array properties are processed recursively.
@@ -26,11 +26,11 @@ export interface Options {
    *
    * @default false
    */
-  readonly shallow?: boolean
+  readonly shallow?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-type InvalidJSONValue = bigint | Function | undefined | symbol
+type InvalidJSONValue = bigint | Function | undefined | symbol;
 
 type ReturnValue<T, Shallow extends boolean> = T extends (infer ArrayItem)[]
   ? Shallow extends true
@@ -44,15 +44,13 @@ type ReturnValue<T, Shallow extends boolean> = T extends (infer ArrayItem)[]
         ? ReturnType<T['toJSON']>
         : T extends object
           ? {
-              [key in keyof T as T[key] extends InvalidJSONValue
-                ? never
-                : Exclude<key, symbol>]?: Shallow extends true
+              [key in keyof T as T[key] extends InvalidJSONValue ? never : Exclude<key, symbol>]?: Shallow extends true
                 ? T[key]
-                : ReturnValue<T[key], Shallow>
+                : ReturnValue<T[key], Shallow>;
             }
-          : T
+          : T;
 
-type ReasonWithError = 'unsafeException' | 'unsafeGetter' | 'unsafeToJSON'
+type ReasonWithError = 'unsafeException' | 'unsafeGetter' | 'unsafeToJSON';
 
 type ReasonWithoutError =
   | 'descriptorNotConfigurable'
@@ -69,12 +67,12 @@ type ReasonWithoutError =
   | 'unsafeBigInt'
   | 'unsafeCycle'
   | 'unsafeSize'
-  | 'unstableInfinite'
+  | 'unstableInfinite';
 
 /**
  * Reason why a property was changed.
  */
-export type Reason = ReasonWithError | ReasonWithoutError
+export type Reason = ReasonWithError | ReasonWithoutError;
 
 /**
  * Change applied to [`value`](#value).
@@ -85,31 +83,31 @@ export type Change<ReasonValue extends Reason = Reason> = {
   /**
    * Property path.
    */
-  path: PropertyKey[]
+  path: PropertyKey[];
 
   /**
    * Property value before the change.
    */
-  oldValue: unknown
+  oldValue: unknown;
 
   /**
    * Property value after the change.
    * `undefined` means the property was omitted.
    */
-  newValue: unknown
+  newValue: unknown;
 
   /**
    * Reason for the change.
    */
-  reason: ReasonValue
+  reason: ReasonValue;
 } & (ReasonValue extends ReasonWithError
   ? {
       /**
        * Error that triggered the change.
        */
-      error: Error
+      error: Error;
     }
-  : object)
+  : object);
 
 /**
  * Makes `value` JSON-safe by:
@@ -150,12 +148,10 @@ export default function safeJsonValue<T, OptionsArg extends Options = object>(
    * The top-level `value` itself might be changed (including to `undefined`) if
    * it is either invalid JSON or has a `toJSON()` method.
    */
-  value:
-    | ReturnValue<T, OptionsArg['shallow'] extends true ? true : false>
-    | undefined
+  value: ReturnValue<T, OptionsArg['shallow'] extends true ? true : false> | undefined;
 
   /**
    * List of changes applied to `value`.
    */
-  changes: Change[]
-}
+  changes: Change[];
+};

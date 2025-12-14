@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception'
+import normalizeException from 'normalize-exception';
 
 // When dynamic functions (`object.toJSON()`, `get` method or Proxy hook):
 //  - Returns new objects (as opposed to reference to existing objects)
@@ -13,13 +13,7 @@ import normalizeException from 'normalize-exception'
 //  - When a `get` method or Proxy hook (not `object.toJSON()`)
 //  - Calls this library itself
 //  - Passing a reference (not a copy) to itself or to an ancestor
-export const handleUnsafeException = ({
-  value,
-  changes,
-  path,
-  error,
-  size,
-}) => {
+export const handleUnsafeException = ({ value, changes, path, error, size }) => {
   // eslint-disable-next-line fp/no-mutating-methods
   changes.push({
     path,
@@ -27,6 +21,6 @@ export const handleUnsafeException = ({
     newValue: undefined,
     reason: 'unsafeException',
     error: normalizeException(error),
-  })
-  return { value: undefined, size }
-}
+  });
+  return { value: undefined, size };
+};

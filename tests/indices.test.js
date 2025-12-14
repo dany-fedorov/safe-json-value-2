@@ -1,4 +1,4 @@
-import safeJsonValue from '../dist/main'
+import safeJsonValue from '../dist/main';
 
 test.each(
   ['prop', Symbol('test')],
@@ -8,7 +8,7 @@ test.each(
     {
       descriptor: {
         get: () => {
-          throw new Error('test')
+          throw new Error('test');
         },
       },
       oldValue: undefined,
@@ -22,10 +22,10 @@ test.each(
         ...descriptor,
         enumerable,
         configurable: true,
-      })
-      const { value, changes } = safeJsonValue(array)
-      t.true(value[0])
-      t.false(key in value)
+      });
+      const { value, changes } = safeJsonValue(array);
+      t.true(value[0]);
+      t.false(key in value);
       t.deepEqual(changes, [
         {
           path: [key],
@@ -33,7 +33,7 @@ test.each(
           newValue: undefined,
           reason: 'ignoredArrayProperty',
         },
-      ])
-    })
+      ]);
+    });
   },
-)
+);

@@ -1,4 +1,4 @@
-import safeJsonValue from 'safe-json-value-2'
+import safeJsonValue from 'safe-json-value-2';
 
 test.each(
   [
@@ -20,11 +20,11 @@ test.each(
   ],
   ({ title }, { value, reason }, { getInput, output, change }) => {
     test(`Omit invalid types | ${title}`, (t) => {
-      const input = getInput(value)
+      const input = getInput(value);
       t.deepEqual(safeJsonValue(input), {
         value: output,
         changes: [{ ...change, oldValue: value, newValue: undefined, reason }],
-      })
-    })
+      });
+    });
   },
-)
+);

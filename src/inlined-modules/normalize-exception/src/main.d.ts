@@ -9,23 +9,23 @@ export interface Options {
    * [`error.errors`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AggregateError)
    * are normalized recursively, when present.
    */
-  readonly shallow?: boolean
+  readonly shallow?: boolean;
 }
 
 type DefinedString<Value, DefaultValue> = Value extends string
   ? Value extends ''
     ? DefaultValue
     : Value
-  : DefaultValue
+  : DefaultValue;
 
 type NormalizedError<ErrorArg> = Error &
   (ErrorArg extends Error
     ? {
-        name: DefinedString<ErrorArg['name'], Error['constructor']['name']>
-        message: DefinedString<ErrorArg['message'], ''>
-        stack: DefinedString<ErrorArg['stack'], string>
+        name: DefinedString<ErrorArg['name'], Error['constructor']['name']>;
+        message: DefinedString<ErrorArg['message'], ''>;
+        stack: DefinedString<ErrorArg['stack'], string>;
       }
-    : unknown)
+    : unknown);
 
 /**
  * Normalize exception/error.
@@ -72,7 +72,4 @@ type NormalizedError<ErrorArg> = Error &
  * console.log(normalizedError.cause) // Error: innerError
  * ```
  */
-export default function normalizeException<ErrorArg>(
-  error: ErrorArg,
-  options?: Options,
-): NormalizedError<ErrorArg>
+export default function normalizeException<ErrorArg>(error: ErrorArg, options?: Options): NormalizedError<ErrorArg>;

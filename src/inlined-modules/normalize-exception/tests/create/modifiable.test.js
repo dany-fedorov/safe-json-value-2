@@ -1,4 +1,4 @@
-import normalizeException from 'normalize-exception'
+import normalizeException from 'normalize-exception';
 
 test.each(
   [
@@ -17,17 +17,17 @@ test.each(
   ],
   ({ title }, { propName, value }, descriptor) => {
     test(`Fix invalid descriptors | ${title}`, (t) => {
-      const error = new Error('test')
+      const error = new Error('test');
       // eslint-disable-next-line fp/no-mutating-methods
-      Object.defineProperty(error, propName, { ...descriptor, value })
-      const errorA = normalizeException(error)
-      const descriptorA = Object.getOwnPropertyDescriptor(errorA, propName)
+      Object.defineProperty(error, propName, { ...descriptor, value });
+      const errorA = normalizeException(error);
+      const descriptorA = Object.getOwnPropertyDescriptor(errorA, propName);
       t.deepEqual(descriptorA, {
         value: descriptorA.value,
         writable: true,
         enumerable: false,
         configurable: true,
-      })
-    })
+      });
+    });
   },
-)
+);

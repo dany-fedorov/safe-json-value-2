@@ -1,11 +1,11 @@
-import safeJsonValue from 'safe-json-value-2'
+import safeJsonValue from 'safe-json-value-2';
 
 test('Omit circular values', (t) => {
-  const input = {}
+  const input = {};
   // eslint-disable-next-line fp/no-mutation
-  input.self = input
-  const { value, changes } = safeJsonValue(input)
-  t.false('self' in value)
+  input.self = input;
+  const { value, changes } = safeJsonValue(input);
+  t.false('self' in value);
   t.deepEqual(changes, [
     {
       path: ['self'],
@@ -13,5 +13,5 @@ test('Omit circular values', (t) => {
       newValue: undefined,
       reason: 'unsafeCycle',
     },
-  ])
-})
+  ]);
+});

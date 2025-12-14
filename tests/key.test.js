@@ -1,6 +1,6 @@
-import safeJsonValue from 'safe-json-value-2'
+import safeJsonValue from 'safe-json-value-2';
 
-const symbol = Symbol('test')
+const symbol = Symbol('test');
 test.each(
   [
     {
@@ -47,7 +47,7 @@ test.each(
   ],
   ({ title }, { input, output, changes }) => {
     test(`Omit invalid keys | ${title}`, (t) => {
-      t.deepEqual(safeJsonValue(input), { value: output, changes })
-    })
+      t.deepEqual(safeJsonValue(input), { value: output, changes });
+    });
   },
-)
+);

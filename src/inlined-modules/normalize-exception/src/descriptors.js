@@ -1,52 +1,50 @@
 // Ensure error properties are writable and non-enumerable
 export const normalizeDescriptors = (error) => {
   CORE_ERROR_PROPS.forEach((propName) => {
-    normalizeDescriptor(error, propName)
-  })
-}
+    normalizeDescriptor(error, propName);
+  });
+};
 
-export const CORE_ERROR_PROPS = ['name', 'message', 'stack', 'cause', 'errors']
+export const CORE_ERROR_PROPS = ['name', 'message', 'stack', 'cause', 'errors'];
 
 const normalizeDescriptor = (error, propName) => {
-  const descriptor = getDescriptor(error, propName)
+  const descriptor = getDescriptor(error, propName);
 
   if (descriptor === undefined) {
-    return
+    return;
   }
 
   if (isReadonlyGetter(descriptor)) {
-    setErrorProperty(error, propName, error[propName])
-    return
+    setErrorProperty(error, propName, error[propName]);
+    return;
   }
 
   if (isInvalidDescriptor(descriptor)) {
-    setErrorDescriptor(error, propName, descriptor)
+    setErrorDescriptor(error, propName, descriptor);
   }
-}
+};
 
 // `Error.name` is usually on the prototype, i.e. it is not an own property
 export const getDescriptor = (value, propName) => {
-  const descriptor = Object.getOwnPropertyDescriptor(value, propName)
+  const descriptor = Object.getOwnPropertyDescriptor(value, propName);
 
   if (descriptor !== undefined) {
-    return descriptor
+    return descriptor;
   }
 
-  const prototype = Object.getPrototypeOf(value)
-  return prototype === null ? undefined : getDescriptor(prototype, propName)
-}
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === null ? undefined : getDescriptor(prototype, propName);
+};
 
 // Getters are allowed, but not readonly
-const isReadonlyGetter = ({ get, set }) =>
-  get !== undefined && set === undefined
+const isReadonlyGetter = ({ get, set }) => get !== undefined && set === undefined;
 
-const isInvalidDescriptor = ({ enumerable, writable }) =>
-  enumerable || !writable
+const isInvalidDescriptor = ({ enumerable, writable }) => enumerable || !writable;
 
 // Error properties are writable and non-enumerable
 export const setErrorProperty = (error, propName, value) => {
-  setErrorDescriptor(error, propName, { value })
-}
+  setErrorDescriptor(error, propName, { value });
+};
 
 // Handle properties which are getters|setters
 const setErrorDescriptor = (error, propName, descriptor) => {
@@ -56,5 +54,5 @@ const setErrorDescriptor = (error, propName, descriptor) => {
     ...('get' in descriptor || 'set' in descriptor ? {} : { writable: true }),
     enumerable: false,
     configurable: true,
-  })
-}
+  });
+};

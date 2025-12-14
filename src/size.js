@@ -1,4 +1,4 @@
-import { safeGetChangeProp } from './get.js'
+import { safeGetChangeProp } from './get.js';
 
 // Apply `maxSize`, which omits values if they their JSON size would be too
 // high.
@@ -25,15 +25,15 @@ import { safeGetChangeProp } from './get.js'
 // at all, for performance reason.
 export const addSize = ({ type, size, maxSize, changes, path, context }) => {
   if (maxSize === SKIP_MAX_SIZE) {
-    return { size, stop: false }
+    return { size, stop: false };
   }
 
-  const { getSize, getOldValue } = SIZED_TYPES[type]
-  const newSize = size + getSize(context)
-  const stop = newSize > maxSize
+  const { getSize, getOldValue } = SIZED_TYPES[type];
+  const newSize = size + getSize(context);
+  const stop = newSize > maxSize;
 
   if (!stop) {
-    return { size: newSize, stop }
+    return { size: newSize, stop };
   }
 
   // eslint-disable-next-line fp/no-mutating-methods
@@ -42,28 +42,26 @@ export const addSize = ({ type, size, maxSize, changes, path, context }) => {
     oldValue: getOldValue(context),
     newValue: undefined,
     reason: 'unsafeSize',
-  })
-  return { size, stop }
-}
+  });
+  return { size, stop };
+};
 
 // Skip checking for size when `maxSize` option equals this value
-const SKIP_MAX_SIZE = Number.POSITIVE_INFINITY
+const SKIP_MAX_SIZE = Number.POSITIVE_INFINITY;
 
 // Default value for `maxSize` option.
 // Chosen based on v8 max string length, which is ~5e8, which is smaller than
 // SpiderMonkey (~1e9) and SquirrelFish (~2e9).
-export const DEFAULT_MAX_SIZE = 1e7
+export const DEFAULT_MAX_SIZE = 1e7;
 
 const SIZED_TYPES = {
   value: {
     getSize: (value) => {
       if (value === undefined) {
-        return 0
+        return 0;
       }
 
-      return typeof value === 'object' && value !== null
-        ? 2
-        : getJsonLength(value)
+      return typeof value === 'object' && value !== null ? 2 : getJsonLength(value);
     },
     getOldValue: (value) => value,
   },
@@ -72,11 +70,10 @@ const SIZED_TYPES = {
     getOldValue: safeGetChangeProp,
   },
   objectProp: {
-    getSize: ({ key, empty }) =>
-      typeof key === 'symbol' ? 0 : getJsonLength(key) + (empty ? 1 : 2),
+    getSize: ({ key, empty }) => (typeof key === 'symbol' ? 0 : getJsonLength(key) + (empty ? 1 : 2)),
     getOldValue: safeGetChangeProp,
   },
-}
+};
 
 // We use `JSON.stringify()` to compute the length of strings (including
 // property keys) to take into account escaping, including:
@@ -88,8 +85,8 @@ const SIZED_TYPES = {
 //  - However, this is much faster and is good enough for this specific purpose
 const getJsonLength = (value) => {
   try {
-    return JSON.stringify(value).length
+    return JSON.stringify(value).length;
   } catch {
-    return Number.POSITIVE_INFINITY
+    return Number.POSITIVE_INFINITY;
   }
-}
+};

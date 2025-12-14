@@ -1,21 +1,10 @@
-import { safeGetProp } from './get.js'
-import { omitInvalidKey } from './key.js'
-import { addSize } from './size.js'
+import { safeGetProp } from './get.js';
+import { omitInvalidKey } from './key.js';
+import { addSize } from './size.js';
 
 // Transform an object property or an array item
-export const transformProp = ({
-  parent,
-  changes,
-  ancestors,
-  path,
-  maxSize,
-  key,
-  type,
-  empty,
-  size,
-  recurse,
-}) => {
-  const propPath = [...path, key]
+export const transformProp = ({ parent, changes, ancestors, path, maxSize, key, type, empty, size, recurse }) => {
+  const propPath = [...path, key];
   const { size: sizeA, stop } = addSize({
     type,
     size,
@@ -23,10 +12,10 @@ export const transformProp = ({
     changes,
     path: propPath,
     context: { empty, parent, key },
-  })
+  });
 
   if (stop) {
-    return { empty, size }
+    return { empty, size };
   }
 
   const { value, size: sizeB } = transformPropValue({
@@ -38,27 +27,16 @@ export const transformProp = ({
     size: sizeA,
     maxSize,
     recurse,
-  })
-  return value === undefined
-    ? { empty, size }
-    : { empty: false, size: sizeB, value }
-}
+  });
+  return value === undefined ? { empty, size } : { empty: false, size: sizeB, value };
+};
 
 // Recurse over an object property or array index
-const transformPropValue = ({
-  parent,
-  key,
-  changes,
-  ancestors,
-  path,
-  size,
-  maxSize,
-  recurse,
-}) => {
-  const { prop, safe } = safeGetProp({ parent, key, changes, path })
+const transformPropValue = ({ parent, key, changes, ancestors, path, size, maxSize, recurse }) => {
+  const { prop, safe } = safeGetProp({ parent, key, changes, path });
 
   if (!safe) {
-    return { value: prop, size }
+    return { value: prop, size };
   }
 
   const { prop: propA, validKey } = omitInvalidKey({
@@ -67,11 +45,11 @@ const transformPropValue = ({
     prop,
     changes,
     path,
-  })
+  });
 
   if (!validKey) {
-    return { value: propA, size }
+    return { value: propA, size };
   }
 
-  return recurse({ value: propA, changes, ancestors, path, size, maxSize })
-}
+  return recurse({ value: propA, changes, ancestors, path, size, maxSize });
+};

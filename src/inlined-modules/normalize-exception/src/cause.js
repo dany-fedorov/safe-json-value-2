@@ -1,4 +1,4 @@
-import { setErrorProperty } from './descriptors.js'
+import { setErrorProperty } from './descriptors.js';
 
 // Recurse over `error.cause`.
 // Skip `error.cause` if infinitely recursive.
@@ -13,15 +13,15 @@ import { setErrorProperty } from './descriptors.js'
 //    from somewhere else
 export const normalizeCause = (error, recurse) => {
   if (!('cause' in error)) {
-    return
+    return;
   }
 
-  const cause = error.cause === undefined ? error.cause : recurse(error.cause)
+  const cause = error.cause === undefined ? error.cause : recurse(error.cause);
 
   if (cause === undefined) {
     // eslint-disable-next-line fp/no-delete
-    delete error.cause
+    delete error.cause;
   } else {
-    setErrorProperty(error, 'cause', cause)
+    setErrorProperty(error, 'cause', cause);
   }
-}
+};

@@ -1,4 +1,4 @@
-import safeJsonValue from 'safe-json-value-2'
+import safeJsonValue from 'safe-json-value-2';
 
 test('Omit removed properties', (t) => {
   t.deepEqual(safeJsonValue([0, undefined, 1]), {
@@ -11,5 +11,5 @@ test('Omit removed properties', (t) => {
         reason: 'ignoredUndefined',
       },
     ],
-  })
-})
+  });
+});

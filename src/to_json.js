@@ -1,6 +1,6 @@
-import normalizeException from 'normalize-exception'
+import normalizeException from 'normalize-exception';
 
-import { isObject } from './is_object.js'
+import { isObject } from './is_object.js';
 
 // Replace `object.toJSON()` by its return value.
 //  - Including for native classes like `Date`
@@ -13,19 +13,19 @@ import { isObject } from './is_object.js'
 //    have different types/shapes depending on whether `toJSON()` throws
 export const callToJSON = (value, changes, path) => {
   if (!hasToJSON(value)) {
-    return value
+    return value;
   }
 
   try {
-    const toJSONResult = triggerToJSON(value)
+    const toJSONResult = triggerToJSON(value);
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,
       newValue: toJSONResult,
       reason: 'unresolvedToJSON',
-    })
-    return toJSONResult
+    });
+    return toJSONResult;
   } catch (error) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
@@ -34,15 +34,12 @@ export const callToJSON = (value, changes, path) => {
       newValue: undefined,
       reason: 'unsafeToJSON',
       error: normalizeException(error),
-    })
+    });
   }
-}
+};
 
 const hasToJSON = (value) =>
-  isObject(value) &&
-  'toJSON' in value &&
-  typeof value.toJSON === 'function' &&
-  !TO_JSON_RECURSION.has(value)
+  isObject(value) && 'toJSON' in value && typeof value.toJSON === 'function' && !TO_JSON_RECURSION.has(value);
 
 // We handle the common use case of an `object.toJSON()` calling this library
 // itself.
@@ -52,15 +49,15 @@ const hasToJSON = (value) =>
 //  - We do not set a symbol property instead, since this might change how
 //    user-defined `object.toJSON()` behaves
 const triggerToJSON = (object) => {
-  TO_JSON_RECURSION.add(object)
+  TO_JSON_RECURSION.add(object);
 
   try {
-    return object.toJSON()
+    return object.toJSON();
   } finally {
-    TO_JSON_RECURSION.delete(object)
+    TO_JSON_RECURSION.delete(object);
   }
-}
+};
 
 // Uses a WeakSet instead of a Set since this is a top-level variable and we
 // want to make sure there are no memory leaks.
-const TO_JSON_RECURSION = new WeakSet([])
+const TO_JSON_RECURSION = new WeakSet([]);

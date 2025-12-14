@@ -9,8 +9,8 @@ export const omitInvalidKey = ({ parent, key, prop, changes, path }) => {
       oldValue: prop,
       newValue: undefined,
       reason: 'ignoredSymbolKey',
-    })
-    return { prop: undefined, validKey: false }
+    });
+    return { prop: undefined, validKey: false };
   }
 
   if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
@@ -20,11 +20,11 @@ export const omitInvalidKey = ({ parent, key, prop, changes, path }) => {
       oldValue: prop,
       newValue: undefined,
       reason: 'ignoredNotEnumerable',
-    })
-    return { prop: undefined, validKey: false }
+    });
+    return { prop: undefined, validKey: false };
   }
 
-  return { prop, validKey: true }
-}
+  return { prop, validKey: true };
+};
 
-const { propertyIsEnumerable: isEnum } = Object.prototype
+const { propertyIsEnumerable: isEnum } = Object.prototype;
