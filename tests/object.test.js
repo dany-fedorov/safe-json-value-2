@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import safeJsonValue from 'safe-json-value'
+import safeJsonValue from 'safe-json-value-2'
 
 test('Keep null prototypes', (t) => {
   const { value, changes } = safeJsonValue(Object.create(null))

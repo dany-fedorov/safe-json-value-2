@@ -4,7 +4,7 @@ import safeJsonValue, {
   type Change,
   type Options,
   type Reason,
-} from 'safe-json-value'
+} from '../src/main.js'
 
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]

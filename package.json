@@ -1,21 +1,23 @@
 {
-  "name": "safe-json-value",
+  "name": "safe-json-value-2",
   "version": "3.0.1",
   "type": "module",
   "exports": {
-    "types": "./build/src/main.d.ts",
-    "default": "./build/src/main.js"
+    "types": "./dist/main.d.ts",
+    "default": "./dist/main.js"
   },
-  "main": "./build/src/main.js",
-  "types": "./build/src/main.d.ts",
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "files": [
-    "build/src/**/*.{js,json,d.ts}",
-    "!build/src/**/*.test.js",
-    "!build/src/{helpers,fixtures}"
+    "dist/src/**/*.{js,json,d.ts}",
+    "!dist/src/**/*.test.js",
+    "!dist/src/{helpers,fixtures}"
   ],
-  "sideEffects": false,
+  "sideEffbuiluects": false,
   "scripts": {
-    "test": "gulp test"
+    "test-ava": "ava",
+    "test": "NODE_OPTIONS='--stack-trace-limit=1000' ./node_modules/.bin/jest",
+    "build": "tsc -p ./tsconfig.build.json"
   },
   "description": "⛑️ JSON serialization should never fail",
   "keywords": [
@@ -41,13 +43,13 @@
     "validation"
   ],
   "license": "Apache-2.0",
-  "homepage": "https://www.github.com/ehmicky/safe-json-value",
+  "homepage": "https://www.github.com/ehmicky/safe-json-value-2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ehmicky/safe-json-value.git"
+    "url": "git+https://github.com/ehmicky/safe-json-value-2.git"
   },
   "bugs": {
-    "url": "https://github.com/ehmicky/safe-json-value/issues"
+    "url": "https://github.com/ehmicky/safe-json-value-2/issues"
   },
   "author": "ehmicky <ehmicky@gmail.com> (https://github.com/ehmicky)",
   "directories": {
@@ -58,10 +60,17 @@
     "normalize-exception": "^4.0.1"
   },
   "devDependencies": {
-    "@ehmicky/dev-tasks": "^3.0.34",
-    "@ehmicky/eslint-config": "^20.0.32",
-    "@ehmicky/prettier-config": "^1.0.6",
-    "test-each": "^7.0.1"
+    "@jest/types": "^30.2.0",
+    "@tsconfig/strictest": "^2.0.1",
+    "@types/jest": "^30.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "ava": "^6.4.1",
+    "jest": "^30.2.0",
+    "test-each": "^7.0.1",
+    "ts-jest": "^29.4.5",
+    "tsd": "^0.33.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.18.0"

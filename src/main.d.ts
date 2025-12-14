@@ -1,5 +1,5 @@
 /**
- * `safe-json-value` options
+ * `safe-json-value-2` options
  */
 export interface Options {
   /**

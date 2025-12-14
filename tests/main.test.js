@@ -1,6 +1,4 @@
-import test from 'ava'
-
-import safeJsonValue from 'safe-json-value'
+import safeJsonValue from '../dist/main'
 
 test('Is deep by default on objects', (t) => {
   t.deepEqual(safeJsonValue({ one: 0n }).value, {})
