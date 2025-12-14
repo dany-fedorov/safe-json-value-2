@@ -18,18 +18,13 @@ const getInfiniteToJSONTwo = () => ({
   toJSON: () => ({ prop: true, propTwo: getInfiniteToJSONTwo() }),
 });
 
-test.each(
-  [{ getInput: getInfiniteGetter }, { getInput: getInfiniteToJSON }, { getInput: getInfiniteToJSONTwo }],
-  ({ title }, { getInput }) => {
-    test(`Handle dynamic infinite functions | ${title}`, (t) => {
-      const input = getInput();
-      const { value, changes } = safeJsonValue(input);
-      t.true('prop' in value);
-      const lastChange = changes.at(-1);
-      t.true(Array.isArray(lastChange.path) && lastChange.path.every(isProp));
-      t.is(typeof lastChange.oldValue, 'object');
-      t.is(lastChange.newValue, undefined);
-      t.is(lastChange.reason, 'unsafeException');
-    });
-  },
-);
+test.each([{ getInput: getInfiniteGetter }, { getInput: getInfiniteToJSON }, { getInput: getInfiniteToJSONTwo }])(`Handle dynamic infinite functions | %#`, ({ getInput }) => {
+  const input = getInput();
+  const { value, changes } = safeJsonValue(input);
+  expect('prop' in value).toBe(true);
+  const lastChange = changes.at(-1);
+  expect(Array.isArray(lastChange.path) && lastChange.path.every(isProp)).toBe(true);
+  expect(typeof lastChange.oldValue).toBe('object');
+  expect(lastChange.newValue).toBe(undefined);
+  expect(lastChange.reason).toBe('unsafeException');
+});

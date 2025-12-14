@@ -6,7 +6,7 @@ test('Omit circular values', (t) => {
   input.self = input;
   const { value, changes } = safeJsonValue(input);
   t.false('self' in value);
-  t.deepEqual(changes, [
+  expect(changes).toEqual([
     {
       path: ['self'],
       oldValue: input,

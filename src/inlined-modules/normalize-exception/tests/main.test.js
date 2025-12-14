@@ -4,59 +4,57 @@ import normalizeException from '../src/main.js';
 
 const { propertyIsEnumerable: isEnum } = Object.prototype;
 
-test('Normal errors are left as is', (t) => {
+test('Normal errors are left as is', () => {
   const error = new TypeError('test');
   const errorString = error.toString();
   const errorA = normalizeException(error);
-  t.true(errorA instanceof TypeError);
-  t.is(errorA.toString(), errorString);
+  expect(errorA instanceof TypeError).toBe(true);
+  expect(errorA.toString()).toBe(errorString);
 });
 
-test('Cross-realm errors are left as is', (t) => {
+test('Cross-realm errors are left as is', () => {
   const CrossTypeError = runInNewContext('TypeError');
   const error = new CrossTypeError('test');
   const errorA = normalizeException(error);
-  t.is(errorA, error);
-  t.true(errorA instanceof CrossTypeError);
+  expect(errorA).toBe(error);
+  expect(errorA instanceof CrossTypeError).toBe(true);
 });
 
-test.each([undefined, true, ''], ({ title }, value) => {
-  test(`Fix invalid error.name | ${title}`, (t) => {
-    const error = new TypeError('test');
-    error.name = value;
-    t.is(normalizeException(error).name, 'TypeError');
-    t.false(isEnum.call(error, 'name'));
-  });
-
-  test(`Fix invalid error.message | ${title}`, (t) => {
-    const error = new Error('test');
-    error.message = value;
-    t.is(normalizeException(error).message, '');
-    t.false(isEnum.call(error, 'message'));
-  });
-
-  test(`Fix invalid error.stack | ${title}`, (t) => {
-    const error = new Error('test');
-    error.stack = value;
-    t.true(normalizeException(error).stack.includes('test'));
-    t.false(isEnum.call(error, 'stack'));
-  });
+test.each([undefined, true, ''])(`Fix invalid error.name | %#`, (value) => {
+  const error = new TypeError('test');
+  error.name = value;
+  expect(normalizeException(error).name).toBe('TypeError');
+  expect(isEnum.call(error, 'name')).toBe(false);
 });
 
-test.serial('Fix invalid error.name without constructor names', (t) => {
+test.each([undefined, true, ''])(`Fix invalid error.message | %#`, (value) => {
+  const error = new Error('test');
+  error.message = value;
+  expect(normalizeException(error).message).toBe('');
+  expect(isEnum.call(error, 'message')).toBe(false);
+});
+
+test.each([undefined, true, ''])(`Fix invalid error.stack | %#`, (value) => {
+  const error = new Error('test');
+  error.stack = value;
+  expect(normalizeException(error).stack.includes('test')).toBe(true);
+  expect(isEnum.call(error, 'stack')).toBe(false);
+});
+
+test.serial('Fix invalid error.name without constructor names', () => {
   const error = new TypeError('test');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(TypeError, 'name', { value: '' });
   error.name = '';
-  t.is(normalizeException(error).name, 'Error');
+  expect(normalizeException(error).name).toBe('Error');
   // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(TypeError, 'name', { value: 'TypeError' });
 });
 
-test('Does not fix error.name not matching constructor names', (t) => {
+test('Does not fix error.name not matching constructor names', () => {
   const error = new TypeError('test');
   error.name = 'Error';
-  t.is(normalizeException(error).name, 'Error');
+  expect(normalizeException(error).name).toBe('Error');
 });
 
 // eslint-disable-next-line fp/no-class
@@ -64,10 +62,10 @@ class TestError extends Error {}
 // eslint-disable-next-line fp/no-mutation
 TestError.prototype.name = 'OtherError';
 
-test('Prefer prototype.name over constructor.name', (t) => {
+test('Prefer prototype.name over constructor.name', () => {
   const error = new TestError('test');
   error.name = '';
-  t.is(normalizeException(error).name, 'OtherError');
+  expect(normalizeException(error).name).toBe('OtherError');
 });
 
 // eslint-disable-next-line fp/no-class
@@ -75,8 +73,8 @@ class InvalidError extends Error {}
 // eslint-disable-next-line fp/no-mutation
 InvalidError.prototype.name = '';
 
-test('Fallback to constructor.name', (t) => {
+test('Fallback to constructor.name', () => {
   const error = new InvalidError('test');
   error.name = '';
-  t.is(normalizeException(error).name, 'InvalidError');
+  expect(normalizeException(error).name).toBe('InvalidError');
 });

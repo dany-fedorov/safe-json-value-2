@@ -1,5 +1,5 @@
-import isErrorInstance from 'is-error-instance';
-import isPlainObj from 'is-plain-obj';
+import isErrorInstance from '../../../is-error-instance/src/main';
+import isPlainObj from '../../../is-plain-obj/index.js';
 
 import { isNonModifiableError } from './modifiable.js';
 import { objectifyError } from './object.js';

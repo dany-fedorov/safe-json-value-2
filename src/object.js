@@ -1,4 +1,4 @@
-import isPlainObj from 'is-plain-obj';
+import isPlainObj from './inlined-modules/is-plain-obj/index.js';
 
 import { transformProp } from './prop.js';
 

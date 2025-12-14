@@ -4,11 +4,11 @@ import normalizeException from '../../src/main.js';
 
 const { toString: objectToString } = Object.prototype;
 
-test('Plain-objects errors work cross-realm', (t) => {
+test('Plain-objects errors work cross-realm', () => {
   const props = runInNewContext('({ name: "TypeError" })');
   const error = normalizeException(props);
-  t.is(error.name, 'TypeError');
-  t.true(error instanceof TypeError);
+  expect(error.name).toBe('TypeError');
+  expect(error instanceof TypeError).toBe(true);
 });
 
 const constructorWithoutName = () => {};
@@ -20,56 +20,46 @@ Object.defineProperty(constructorWithEmptyName, 'name', { value: '' });
 const constructorWithFakeName = () => {};
 // eslint-disable-next-line fp/no-mutating-methods
 Object.defineProperty(constructorWithFakeName, 'name', { value: 'Error' });
-test.each(
-  ['', constructorWithoutName, constructorWithEmptyName, constructorWithFakeName],
-  ({ title }, errorConstructor) => {
-    test(`Plain-objects with errors with wrong constructor | ${title}`, (t) => {
-      const message = 'test';
-      const error = new Error(message);
-      error.constructor = errorConstructor;
-      const errorA = normalizeException(error);
-      t.is(errorA.message, message);
-      t.is(errorA.constructor, Error);
-    });
-  },
-);
+test.each(['', constructorWithoutName, constructorWithEmptyName, constructorWithFakeName])(`Plain-objects with errors with wrong constructor | %#`, (errorConstructor) => {
+  const message = 'test';
+  const error = new Error(message);
+  error.constructor = errorConstructor;
+  const errorA = normalizeException(error);
+  expect(errorA.message).toBe(message);
+  expect(errorA.constructor).toBe(Error);
+});
 
-test('Handle proxies', (t) => {
+test('Handle proxies', () => {
   const message = 'test';
   // eslint-disable-next-line fp/no-proxy
   const proxy = new Proxy(new Error(message), {});
   const error = normalizeException(proxy);
-  t.true(error instanceof Error);
-  t.is(objectToString.call(error), '[object Error]');
-  t.is(error.message, message);
+  expect(error instanceof Error).toBe(true);
+  expect(objectToString.call(error)).toBe('[object Error]');
+  expect(error.message).toBe(message);
 });
 
 const invalidProxyHook = () => {
   throw new Error('proxyError');
 };
 
-test.each(
-  [
-    'set',
-    'get',
-    'deleteProperty',
-    'has',
-    'ownKeys',
-    'defineProperty',
-    'getOwnPropertyDescriptor',
-    'isExtensible',
-    'preventExtensions',
-    'getPrototypeOf',
-    'setPrototypeOf',
-    'apply',
-    'construct',
-  ],
-  ({ title }, hook) => {
-    test(`Handle throwing Proxy.get | ${title}`, (t) => {
-      const error = new Error('test');
-      // eslint-disable-next-line fp/no-proxy
-      const proxy = new Proxy(error, { [hook]: invalidProxyHook });
-      t.is(typeof normalizeException(proxy).message, 'string');
-    });
-  },
-);
+test.each([
+  'set',
+  'get',
+  'deleteProperty',
+  'has',
+  'ownKeys',
+  'defineProperty',
+  'getOwnPropertyDescriptor',
+  'isExtensible',
+  'preventExtensions',
+  'getPrototypeOf',
+  'setPrototypeOf',
+  'apply',
+  'construct',
+])(`Handle throwing Proxy.get | %s`, (hook) => {
+  const error = new Error('test');
+  // eslint-disable-next-line fp/no-proxy
+  const proxy = new Proxy(error, { [hook]: invalidProxyHook });
+  expect(typeof normalizeException(proxy).message).toBe('string');
+});

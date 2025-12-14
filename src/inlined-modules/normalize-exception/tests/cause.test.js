@@ -8,34 +8,32 @@ const hasErrorCause = () => {
 };
 
 if (hasErrorCause()) {
-  test('Normalize error.cause', (t) => {
+  test('Normalize error.cause', () => {
     const cause = 'inner';
     const error = new Error('test', { cause });
     const errorA = normalizeException(error);
-    t.true(errorA.cause instanceof Error);
-    t.false(isEnum.call(errorA, 'cause'));
-    t.is(errorA.cause.message, cause);
+    expect(errorA.cause instanceof Error).toBe(true);
+    expect(isEnum.call(errorA, 'cause')).toBe(false);
+    expect(errorA.cause.message).toBe(cause);
   });
 
-  test('Does not normalize error.cause if shallow', (t) => {
+  test('Does not normalize error.cause if shallow', () => {
     const cause = 'inner';
     const error = new Error('test', { cause });
     const errorA = normalizeException(error, { shallow: true });
-    t.is(errorA.cause, cause);
+    expect(errorA.cause).toBe(cause);
   });
 
-  test.each([true, false], ({ title }, shallow) => {
-    test(`Delete normalize error.cause undefined | ${title}`, (t) => {
-      const error = new Error('test', { cause: undefined });
-      const errorA = normalizeException(error, { shallow });
-      t.false('cause' in errorA);
-    });
+  test.each([true, false])(`Delete normalize error.cause undefined | %s`, (shallow) => {
+    const error = new Error('test', { cause: undefined });
+    const errorA = normalizeException(error, { shallow });
+    expect('cause' in errorA).toBe(false);
   });
 }
 
-test('Handle infinite error.cause', (t) => {
+test('Handle infinite error.cause', () => {
   const error = new Error('test');
   error.cause = error;
   const errorA = normalizeException(error);
-  t.false('cause' in errorA);
+  expect('cause' in errorA).toBe(false);
 });

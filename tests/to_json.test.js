@@ -6,14 +6,14 @@ test('Calls object.toJSON()', (t) => {
   };
   const { value, changes } = safeJsonValue(input);
   t.true(value);
-  t.deepEqual(changes, [{ path: [], oldValue: input, newValue: true, reason: 'unresolvedToJSON' }]);
+  expect(changes).toEqual([{ path: [], oldValue: input, newValue: true, reason: 'unresolvedToJSON' }]);
 });
 
 test('Handles object.toJSON() returning undefined', (t) => {
   const input = { prop: { toJSON: () => {} } };
   const { value, changes } = safeJsonValue(input);
-  t.deepEqual(value, {});
-  t.deepEqual(changes, [
+  expect(value).toEqual({});
+  expect(changes).toEqual([
     {
       path: ['prop'],
       oldValue: input.prop,
@@ -38,7 +38,7 @@ test('Handles object.toJSON() that throws', (t) => {
   };
   const { value, changes } = safeJsonValue(input);
   t.is(value, undefined);
-  t.deepEqual(changes, [
+  expect(changes).toEqual([
     {
       path: [],
       oldValue: input,
@@ -58,24 +58,24 @@ test('Handles object.toJSON() that throws', (t) => {
 test('Handles object.toJSON that are not functions', (t) => {
   const input = { toJSON: true };
   const { value, changes } = safeJsonValue(input);
-  t.deepEqual(value, input);
-  t.deepEqual(changes, []);
+  expect(value).toEqual(input);
+  expect(changes).toEqual([]);
 });
 
 test('Handles dates', (t) => {
   const input = new Date();
   const newValue = input.toJSON();
   const { value, changes } = safeJsonValue(input);
-  t.deepEqual(value, newValue);
-  t.deepEqual(changes, [{ path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' }]);
+  expect(value).toEqual(newValue);
+  expect(changes).toEqual([{ path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' }]);
 });
 
 test('Does not call object.toJSON() recursively', (t) => {
   const newValue = { toJSON: () => {}, prop: true };
   const input = { toJSON: () => newValue };
   const { value, changes } = safeJsonValue(input);
-  t.deepEqual(value, { prop: true });
-  t.deepEqual(changes, [
+  expect(value).toEqual({ prop: true });
+  expect(changes).toEqual([
     { path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' },
     {
       path: ['toJSON'],
@@ -113,7 +113,7 @@ each([inputCallParent, inputCallSelfCopy], ({ title }, input) => {
     const value = input.prop.toJSON();
     t.false('two' in value.prop);
     t.false('toJSON' in value.prop);
-    t.deepEqual(value, { prop: { prop: { one: true } } });
+    expect(value).toEqual({ prop: { prop: { one: true } } });
   });
 });
 
@@ -121,5 +121,5 @@ test('Handles object.toJSON() that calls the library itself', (t) => {
   const value = inputCallSelfRef.toJSON();
   t.false('two' in value);
   t.false('toJSON' in value);
-  t.deepEqual(value, { one: true });
+  expect(value).toEqual({ one: true });
 });

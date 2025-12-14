@@ -1,11 +1,11 @@
 import safeJsonValue from '../dist/main';
 
 test('Is deep by default on objects', (t) => {
-  t.deepEqual(safeJsonValue({ one: 0n }).value, {});
+  expect(safeJsonValue({ one: 0n }).value).toEqual({});
 });
 
 test('Is deep by default on arrays', (t) => {
-  t.deepEqual(safeJsonValue([0n]).value, []);
+  expect(safeJsonValue([0n]).value).toEqual([]);
 });
 
 test('Can be shallow on objects', (t) => {
@@ -17,12 +17,12 @@ test('Can be shallow on objects', (t) => {
     writable: true,
     configurable: true,
   });
-  t.deepEqual(safeJsonValue(value, { shallow: true }).value, { one: 0n });
+  expect(safeJsonValue(value, { shallow: true }).value).toEqual({ one: 0n });
 });
 
 test('Can be shallow on arrays', (t) => {
   const value = [0n];
-  t.deepEqual(safeJsonValue(value, { shallow: true }).value, value);
+  expect(safeJsonValue(value, { shallow: true }).value).toEqual(value);
 });
 
 test('Can be shallow on non-objects nor arrays', (t) => {

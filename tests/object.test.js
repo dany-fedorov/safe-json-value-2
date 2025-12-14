@@ -2,15 +2,15 @@ import safeJsonValue from 'safe-json-value-2';
 
 test('Keep null prototypes', (t) => {
   const { value, changes } = safeJsonValue(Object.create(null));
-  t.deepEqual(value, {});
-  t.deepEqual(changes, []);
+  expect(value).toEqual({});
+  expect(changes).toEqual([]);
   t.is(Object.getPrototypeOf(value), null);
 });
 
 test('Omit removed properties', (t) => {
   const { value, changes } = safeJsonValue({ prop: undefined });
-  t.deepEqual(value, {});
-  t.deepEqual(changes, [
+  expect(value).toEqual({});
+  expect(changes).toEqual([
     {
       path: ['prop'],
       oldValue: undefined,
@@ -25,7 +25,7 @@ test('Convert any objects to plain objects', (t) => {
   const set = new Set([]);
   // eslint-disable-next-line fp/no-mutation
   set.prop = true;
-  t.deepEqual(safeJsonValue(set), {
+  expect(safeJsonValue(set)).toEqual({
     value: { prop: true },
     changes: [
       {

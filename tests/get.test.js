@@ -1,97 +1,87 @@
 import safeJsonValue from '../src/main.js';
 
-test.each(
-  [
-    {
-      descriptor: { configurable: false, writable: true },
-      reason: 'descriptorNotConfigurable',
-    },
-    {
-      descriptor: { configurable: true, writable: false },
-      reason: 'descriptorNotWritable',
-    },
-  ],
-  ({ title }, { descriptor, reason }) => {
-    test(`Make properties configurable and writable | ${title}`, (t) => {
-      // eslint-disable-next-line fp/no-mutating-methods
-      const input = Object.defineProperty({}, 'prop', {
-        value: true,
-        enumerable: true,
-        ...descriptor,
-      });
-      const { value, changes } = safeJsonValue(input);
-      t.deepEqual(value, { prop: true });
-      t.deepEqual(Object.getOwnPropertyDescriptor(value, 'prop'), {
-        value: true,
-        enumerable: true,
-        configurable: true,
-        writable: true,
-      });
-      t.deepEqual(changes, [{ path: ['prop'], oldValue: true, newValue: true, reason }]);
-    });
+test.each([
+  {
+    descriptor: { configurable: false, writable: true },
+    reason: 'descriptorNotConfigurable',
   },
-);
-
-each(
-  [
-    {
-      input: {
-        // eslint-disable-next-line fp/no-get-set
-        get prop() {
-          return true;
-        },
-      },
-    },
-    {
-      input: {
-        // eslint-disable-next-line fp/no-get-set
-        get prop() {
-          return true;
-        },
-        // eslint-disable-next-line fp/no-get-set
-        set prop(_) {},
-      },
-    },
-    {
-      input: {
-        // eslint-disable-next-line fp/no-get-set
-        get prop() {
-          // eslint-disable-next-line fp/no-mutating-methods, fp/no-this
-          Object.defineProperty(this, 'prop', {
-            value: true,
-            enumerable: true,
-            writable: true,
-            configurable: true,
-          });
-          return true;
-        },
-      },
-      title: 'selfModifyingProp',
-    },
-  ],
-  ({ title }, { input }) => {
-    test(`Resolve getters | ${title}`, (t) => {
-      const { get } = Object.getOwnPropertyDescriptor(input, 'prop');
-      t.deepEqual(safeJsonValue(input), {
-        value: { prop: true },
-        changes: [
-          {
-            path: ['prop'],
-            oldValue: get,
-            newValue: true,
-            reason: 'unresolvedGetter',
-          },
-        ],
-      });
-    });
+  {
+    descriptor: { configurable: true, writable: false },
+    reason: 'descriptorNotWritable',
   },
-);
+])(`Make properties configurable and writable | %j`, ({ descriptor, reason }) => {
+  // eslint-disable-next-line fp/no-mutating-methods
+  const input = Object.defineProperty({}, 'prop', {
+    value: true,
+    enumerable: true,
+    ...descriptor,
+  });
+  const { value, changes } = safeJsonValue(input);
+  expect(value).toEqual({ prop: true });
+  expect(Object.getOwnPropertyDescriptor(value, 'prop')).toEqual({
+    value: true,
+    enumerable: true,
+    configurable: true,
+    writable: true,
+  });
+  expect(changes).toEqual([{ path: ['prop'], oldValue: true, newValue: true, reason }]);
+});
 
-test('Resolve setters without getters', (t) => {
+test.each([
+  {
+    input: {
+      // eslint-disable-next-line fp/no-get-set
+      get prop() {
+        return true;
+      },
+    },
+  },
+  {
+    input: {
+      // eslint-disable-next-line fp/no-get-set
+      get prop() {
+        return true;
+      },
+      // eslint-disable-next-line fp/no-get-set
+      set prop(_) {},
+    },
+  },
+  {
+    input: {
+      // eslint-disable-next-line fp/no-get-set
+      get prop() {
+        // eslint-disable-next-line fp/no-mutating-methods, fp/no-this
+        Object.defineProperty(this, 'prop', {
+          value: true,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        });
+        return true;
+      },
+    },
+    title: 'selfModifyingProp',
+  },
+])(`Resolve getters | $title`, ({ input }) => {
+  const { get } = Object.getOwnPropertyDescriptor(input, 'prop');
+  expect(safeJsonValue(input)).toEqual({
+    value: { prop: true },
+    changes: [
+      {
+        path: ['prop'],
+        oldValue: get,
+        newValue: true,
+        reason: 'unresolvedGetter',
+      },
+    ],
+  });
+});
+
+test('Resolve setters without getters', () => {
   // eslint-disable-next-line fp/no-get-set, accessor-pairs
   const input = { set prop(_) {} };
   const change = { path: ['prop'], newValue: undefined, oldValue: undefined };
-  t.deepEqual(safeJsonValue(input), {
+  expect(safeJsonValue(input)).toEqual({
     value: {},
     changes: [
       { ...change, reason: 'unresolvedGetter' },
@@ -100,7 +90,7 @@ test('Resolve setters without getters', (t) => {
   });
 });
 
-test('Omit getters that throw', (t) => {
+test('Omit getters that throw', () => {
   const error = new Error('test');
   // eslint-disable-next-line fp/no-mutating-methods
   const input = Object.defineProperty({}, 'prop', {
@@ -110,7 +100,7 @@ test('Omit getters that throw', (t) => {
     enumerable: true,
     configurable: true,
   });
-  t.deepEqual(safeJsonValue(input), {
+  expect(safeJsonValue(input)).toEqual({
     value: {},
     changes: [
       {
@@ -124,7 +114,7 @@ test('Omit getters that throw', (t) => {
   });
 });
 
-test('Resolve proxy get hooks', (t) => {
+test('Resolve proxy get hooks', () => {
   // eslint-disable-next-line fp/no-proxy
   const input = new Proxy(
     { prop: false },
@@ -140,13 +130,13 @@ test('Resolve proxy get hooks', (t) => {
       },
     },
   );
-  t.deepEqual(safeJsonValue(input), {
+  expect(safeJsonValue(input)).toEqual({
     value: { prop: true },
     changes: [],
   });
 });
 
-test('Omit proxy get hooks that throw', (t) => {
+test('Omit proxy get hooks that throw', () => {
   const error = new Error('test');
   // eslint-disable-next-line fp/no-proxy
   const input = new Proxy(
@@ -157,7 +147,7 @@ test('Omit proxy get hooks that throw', (t) => {
       },
     },
   );
-  t.deepEqual(safeJsonValue(input), {
+  expect(safeJsonValue(input)).toEqual({
     value: {},
     changes: [
       {

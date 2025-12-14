@@ -1,39 +1,45 @@
 import safeJsonValue from '../dist/main';
 
-test.each(
-  ['prop', Symbol('test')],
-  [true, false],
-  [
-    { descriptor: { value: true, writable: true }, oldValue: true },
-    {
-      descriptor: {
-        get: () => {
-          throw new Error('test');
-        },
+const keys = ['prop', Symbol('test')];
+const enumerableValues = [true, false];
+const descriptorCases = [
+  { descriptor: { value: true, writable: true }, oldValue: true },
+  {
+    descriptor: {
+      get: () => {
+        throw new Error('test');
       },
-      oldValue: undefined,
     },
-  ],
-  // eslint-disable-next-line max-params
-  ({ title }, key, enumerable, { descriptor, oldValue }) => {
-    test(`Omit array properties that are not indices | ${title}`, (t) => {
-      // eslint-disable-next-line fp/no-mutating-methods
-      const array = Object.defineProperty([true], key, {
-        ...descriptor,
-        enumerable,
-        configurable: true,
-      });
-      const { value, changes } = safeJsonValue(array);
-      t.true(value[0]);
-      t.false(key in value);
-      t.deepEqual(changes, [
-        {
-          path: [key],
-          oldValue,
-          newValue: undefined,
-          reason: 'ignoredArrayProperty',
-        },
-      ]);
-    });
+    oldValue: undefined,
   },
+];
+
+const combinedCases = keys.flatMap((key) =>
+  enumerableValues.flatMap((enumerable) =>
+    descriptorCases.map((descriptorCase) => ({
+      key,
+      enumerable,
+      ...descriptorCase,
+    })),
+  ),
 );
+
+test.each(combinedCases)(`Omit array properties that are not indices | %#`, ({ key, enumerable, descriptor, oldValue }) => {
+  // eslint-disable-next-line fp/no-mutating-methods
+  const array = Object.defineProperty([true], key, {
+    ...descriptor,
+    enumerable,
+    configurable: true,
+  });
+  const { value, changes } = safeJsonValue(array);
+  expect(value[0]).toBe(true);
+  expect(key in value).toBe(false);
+  expect(changes).toEqual([
+    {
+      path: [key],
+      oldValue,
+      newValue: undefined,
+      reason: 'ignoredArrayProperty',
+    },
+  ]);
+});

@@ -47,7 +47,7 @@ test('Plain-objects errors can have causes', (t) => {
 test('Plain-objects errors can have aggregate errors', (t) => {
   const errors = [new Error('test')];
   const error = normalizeException({ errors });
-  t.deepEqual(error.errors, errors);
+  expect(error.errors).toEqual(errors);
   t.false(isEnum.call(error, 'errors'));
 });
 

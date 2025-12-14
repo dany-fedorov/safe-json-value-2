@@ -1,7 +1,7 @@
 import safeJsonValue from 'safe-json-value-2';
 
 test('Omit removed properties', (t) => {
-  t.deepEqual(safeJsonValue([0, undefined, 1]), {
+  expect(safeJsonValue([0, undefined, 1])).toEqual({
     value: [0, 1],
     changes: [
       {

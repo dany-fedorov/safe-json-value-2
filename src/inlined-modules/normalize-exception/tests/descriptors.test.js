@@ -55,28 +55,23 @@ const getMessage = () => 'testTwo';
 
 const setMessage = () => {};
 
-test.each(
-  [
-    { propName: 'lineNumber', enumerable: false },
-    { propName: 'columnNumber', enumerable: false },
-    { propName: 'fileName', enumerable: false },
-    { propName: 'line', enumerable: true },
-    { propName: 'column', enumerable: true },
-  ],
-  ({ title }, { propName, enumerable }) => {
-    test(`Non-standard error properties are left as is | ${title}`, (t) => {
-      const error = new Error('test');
-      const value = 0;
-      // eslint-disable-next-line fp/no-mutating-methods
-      Object.defineProperty(error, propName, {
-        value,
-        enumerable,
-        writable: true,
-        configurable: true,
-      });
-      const normalizedError = normalizeException(error);
-      t.is(normalizedError[propName], value);
-      t.is(Object.getOwnPropertyDescriptor(normalizedError, propName).enumerable, enumerable);
-    });
-  },
-);
+test.each([
+  { propName: 'lineNumber', enumerable: false },
+  { propName: 'columnNumber', enumerable: false },
+  { propName: 'fileName', enumerable: false },
+  { propName: 'line', enumerable: true },
+  { propName: 'column', enumerable: true },
+])(`Non-standard error properties are left as is | $propName`, ({ propName, enumerable }) => {
+  const error = new Error('test');
+  const value = 0;
+  // eslint-disable-next-line fp/no-mutating-methods
+  Object.defineProperty(error, propName, {
+    value,
+    enumerable,
+    writable: true,
+    configurable: true,
+  });
+  const normalizedError = normalizeException(error);
+  expect(normalizedError[propName]).toBe(value);
+  expect(Object.getOwnPropertyDescriptor(normalizedError, propName).enumerable).toBe(enumerable);
+});
